@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+RED="\033[31m"
+GREEN="\033[32m"
+TEXT="\033[0;39m"
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+echo ""
+
+for dir in *
+do
+	if [ -d $dir/.git ]
+	then
+		cd $dir
+		echo -e "${bold}${dir}:${normal}"
+		sleep 0.3
+		git pull --rebase
+		echo ""
+		cd ..
+	else
+		echo -e "${RED}ERROR:${TEXT} Unable to sync ${dir}; not a git repository.\n"
+		sleep 0.8
+	fi
+done
+
+echo -e "\n${GREEN}All repositories synced.${TEXT}\n"

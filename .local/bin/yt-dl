@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+TEXT="\033[0;39m"
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
+version=$(yt-dlp --version)
+
+NAME=unknown
+
+unsupportedDistro() {
+    echo -e "\n---------------"
+    echo -e "${YELLOW}${BOLD}The distro you're using ($NAME) is not currently supported for automatic installation.${TEXT}" | fold -s --width=$COLUMNS
+    echo -e "You can visit https://github.com/yt-dlp/yt-dlp/wiki/Installation to install it manually.${NORMAL}" | fold -s --width=$COLUMNS
+    echo -e "---------------\n"
+    sleep 0.05 ; exit 1
+}
+
+unknownDistro() {
+    sleep 2 ; echo ; sleep 0.7
+    echo -e "---------------"
+    echo -e "${RED}${BOLD}ERROR: Unable to detect distribution.${TEXT}" | fold -s --width=$COLUMNS
+    echo -e "${TEXT}The distribution you are using does not support automatic installation.\n" | fold -s --width=$COLUMNS
+    echo -e "${YELLOW}Manual intervention may be required.${NORMAL}" | fold -s --width=$COLUMNS
+    echo -e "---------------\n"
+    sleep 0.05 ; exit 1
+}
+
+clear
+
+echo -e "yt-dlp version $version"
+echo -e "script by https://github.com/Nyatalieeee :3\n\n"
+
+# check if program does *not* exist
+if ! command -v yt-dlp &> /dev/null
+then
+    clear
+    echo -e "yt-dlp is not currently installed."
+    read -p "Would you like to install it now? [y/n] " -n 1 -r
+
+    # check if user wants to install the program
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo -e "\nInstalling yt-dlp..." ; sleep 0.45
+        if [ -f /etc/os-release ]
+        then
+            # use os-release to check which distro the user has installed
+            # (i may have dramaticized this)
+            echo -e "\nDetecting distribution..." ; sleep 1.15
+            . /etc/os-release
+            case "$NAME" in
+                "Alpine Linux")
+                    echo -e "${GREEN}Distribution found.${TEXT}"
+                    echo -e "\nInstalling yt-dlp for ${BOLD}$NAME${NORMAL}...\n" ; sleep 0.4
+                    doas apk -U add yt-dlp
+                    ;;
+                "Arch Linux" | "EndeavourOS" | "ArcoLinux" | "Manjaro Linux")
+                    echo -e "${GREEN}Distribution found.${TEXT}"
+                    echo -e "\nInstalling yt-dlp for ${BOLD}$NAME${NORMAL}...\n" ; sleep 0.4
+                    sudo pacman -S --noconfirm yt-dlp
+                    ;;
+                "Debian GNU/Linux" | "Ubuntu" | "Linux Mint" | "Pop!_OS" | "Raspbian GNU/Linux")
+                    echo -e "${GREEN}Distribution found.${TEXT}"
+                    echo -e "\nInstalling yt-dlp for ${BOLD}$NAME${NORMAL}...\n" ; sleep 0.4
+                    # fuck u apt
+                    sudo add-apt-repository ppa:tomtomtom/yt-dlp
+                    sudo apt update
+                    sudo apt -y install yt-dlp
+                    ;;
+                "Fedora Linux" | "Red Hat Enterprise Linux")
+                    echo -e "${GREEN}Distribution found.${TEXT}"
+                    echo -e "\nInstalling yt-dlp for ${BOLD}$NAME${NORMAL}...\n" ; sleep 0.4
+                    sudo dnf install --assumeyes yt-dlp
+                    ;;
+                "Gentoo" | "Slackware" | "NixOS")
+                    # and fuck these distros
+                    unsupportedDistro
+                    exit 1
+                    ;;
+                "unknown")
+                    unknownDistro
+            esac
+            # checks one more time if program is installed, in case install failed
+            if ! command -v yt-dlp &> /dev/null
+            then
+                echo -e "\n\n${RED}${BOLD}Installation failed. Manual intervention may be required.${TEXT}${NORMAL}\n" | fold -s --width=$COLUMNS
+                echo -e "Aborting...\n"
+                exit 1
+            else
+                echo -e "\n\n${GREEN}${BOLD}yt-dlp successfully installed!${TEXT}${NORMAL}\n\n" ; sleep 2.5
+            fi
+        else
+            # some non-systemd distros don't have /etc/os-release
+            unsupportedDistro
+            exit 1
+        fi
+    else
+        # if user doesn't want to install the program
+        echo -e "\nExiting..."
+        exit 1
+    fi
+fi
+
+echo -e "${BOLD}Paste the playlist URL (ctrl+shift+V)\n"
+echo -e "${YELLOW}NOTE: URL can be from youtube.com OR music.youtube.com." 
+echo -e "NOTE: YTM also counts full albums as playlists. Do what you will with this information${TEXT}${NORMAL}" | fold -s --width=$COLUMNS
+read URL && sleep 0.05
+
+if [ ! $URL ]
+then
+    echo -e "${RED}${BOLD}ERROR:${TEXT} You need to input a playlist URL.${NORMAL}"
+    exit 1
+fi
+
+echo -e "\n------------------------------\n"
+
+echo -e "${BOLD}Enter the directory to download to.\n"
+echo -e "${YELLOW}EXAMPLES: ${NORMAL}${YELLOW}'Music/playlist-name', '$HOME/album-name', '/mnt/C/Users/$USER/Music'" | fold -s --width=$COLUMNS
+echo -e "\n${BOLD}NOTE: ${NORMAL}${YELLOW}If there's no prefix to the name (~, /, etc), it will default to using your home directory as root." | fold -s --width=$COLUMNS
+read DIR_NAME && sleep 0.05
+
+if [ ! $DIR_NAME ]
+then
+    echo -e "${RED}${BOLD}ERROR:${TEXT} You need to input a download directory.${NORMAL}"
+    exit 1
+fi
+
+cd $HOME
+echo -e "${GREEN}${BOLD}"
+mkdir -pv $DIR_NAME
+echo -e "${TEXT}${NORMAL}"
+
+echo -ne "${BOLD}Beginning download.\r" && sleep 1
+echo -ne "Beginning download..\r" && sleep 1
+echo -ne "Beginning download...\r${NORMAL}" && sleep 1.25 && echo -e "\n"
+
+yt-dlp --yes-playlist --newline --extract-audio --windows-filenames --audio-format mp3 --audio-quality 3 -P home:$DIR_NAME -o '%(title)s.%(ext)s' $URL
+
+sleep 0.4
+
+echo -e "\n${GREEN}${BOLD}Download complete!"
+echo -e "Contents can be found in '${DIR_NAME}'${TEXT}${NORMAL}\n"
+
+exit 0

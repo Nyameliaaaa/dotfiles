@@ -1,0 +1,19 @@
+[user]
+name = Amelia Rose
+email = nyameliaaaa@proton.me
+signingkey = /home/ny/.ssh/id_ed25519.pub
+[init]
+defaultBranch = main
+[pull]
+rebase = true
+[commit]
+gpgsign = true
+[tag]
+gpgsign = true
+[filter "lfs"]
+clean = git-lfs clean -- %f
+smudge = git-lfs smudge -- %f
+process = git-lfs filter-process
+required = true
+[gpg]
+format = ssh
