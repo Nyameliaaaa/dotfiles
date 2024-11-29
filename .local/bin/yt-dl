@@ -56,7 +56,7 @@ function getDirName() {
         return 0
     fi
 
-    if [ ! $DIR_NAME ]
+    if [[ ! $DIR_NAME ]]
     then
         echo -e "${RED}${BOLD}ERROR:${TEXT} You need to input a download directory.${NORMAL}"
         exit 1
@@ -150,14 +150,14 @@ getDirName
 
 cd $HOME
 echo -e "${GREEN}${BOLD}"
-mkdir -pv $DIR_NAME
+mkdir -pv "${DIR_NAME}"
 echo -e "${TEXT}${NORMAL}"
 
 echo -ne "${BOLD}Beginning download.\r" && sleep 1
 echo -ne "Beginning download..\r" && sleep 1
 echo -ne "Beginning download...\r${NORMAL}" && sleep 1.25 && echo -e "\n"
 
-yt-dlp --yes-playlist --newline --extract-audio --windows-filenames --audio-format mp3 --audio-quality 3 -P home:$DIR_NAME -o '%(title)s.%(ext)s' $URL
+yt-dlp --yes-playlist --newline --extract-audio --windows-filenames --audio-format mp3 --audio-quality 3 -P home:"${DIR_NAME}" -o '%(title)s.%(ext)s' $URL
 
 sleep 0.4
 
