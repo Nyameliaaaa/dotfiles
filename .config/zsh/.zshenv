@@ -39,6 +39,6 @@ export N_PREFIX="$XDG_DATA_HOME/n"
 export PATH="$PATH:$XDG_BIN_HOME:$CARGO_HOME/bin:$N_PREFIX/bin"
 
 # SECTION: Theme related variables
-export GTK_THEME="Catppuccin-Macchiato-Standard-Pink-Dark:dark"
-export QT_QPA_PLATFORMTHEME="qt6ct"
+# export GTK_THEME="Catppuccin-Macchiato-Standard-Pink-Dark:dark"
+# export QT_QPA_PLATFORMTHEME="qt6ct"
 # !SECTION

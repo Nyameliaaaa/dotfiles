@@ -1,6 +1,6 @@
 [Appearance]
 ColorScheme=Catppuccin-Macchiato
-Font=JetBrainsMono Nerd Font Mono,10,-1,5,600,0,0,0,0,0,0,0,0,0,0,1,SemiBold
+Font=JetBrainsMono Nerd Font Mono,11,-1,5,600,0,0,0,0,0,0,0,0,0,0,1,SemiBold
 
 [Cursor Options]
 CursorShape=2
@@ -21,5 +21,5 @@ HistorySize=4000
 ScrollBarPosition=2
 
 [Terminal Features]
-BellMode=2
+BellMode=1
 BlinkingCursorEnabled=false
